@@ -82,6 +82,9 @@ func Mess(Ses *discordgo.Session, MesC *discordgo.MessageCreate) {
 			if ts[0] == ">amion" {
 				bbb.dg.ChannelMessageSend(MesC.ChannelID, "`Hello, master`")
 				return
+			} else if ts[0] == ">Q" {
+				fmt.Println("Issued quit command, stopping...")
+				os.Exit(0)
 			}
 			if len(ts) > 2 {
 				if ts[0] == ">tb" {
