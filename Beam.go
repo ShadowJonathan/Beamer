@@ -80,7 +80,7 @@ func Ready(s *discordgo.Session, r *discordgo.Ready) {
 	go func() {
 		for {
 			result := GetInput()
-			if defaultchannel == "" {
+			if defaultchannel == "" && !strings.Contains(result, "select") {
 				fmt.Println("Error, default channel not set, do so with '>select' inside one.")
 				continue
 			}
@@ -93,7 +93,10 @@ func Ready(s *discordgo.Session, r *discordgo.Ready) {
 				if face == "select" {
 					defaultchannel = text
 					fmt.Println("Manually selected channel")
-					return
+					continue
+				} else if defaultchannel == "" {
+					fmt.Println("Error, default channel not set, do so with '>select' inside one.")
+					continue
 				}
 				PostDialog(face, text, defaultchannel)
 			}
@@ -137,6 +140,10 @@ func PostDialog(face, text, channel string) {
 	err := png.Encode(b, img)
 	if err != nil {
 		panic(err)
+	}
+	potchan, err := bbb.dg.UserChannelCreate(channel)
+	if err == nil {
+		channel = potchan.ID
 	}
 	bbb.dg.ChannelTyping(channel)
 	bbb.dg.ChannelFileSend(channel, "Dialog.png", b)
