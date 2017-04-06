@@ -90,6 +90,11 @@ func Ready(s *discordgo.Session, r *discordgo.Ready) {
 			} else {
 				face := ts[0]
 				text := strings.Join(ts[1:], " ")
+				if face == "select" {
+					defaultchannel = text
+					fmt.Println("Manually selected channel")
+					return
+				}
 				PostDialog(face, text, defaultchannel)
 			}
 		}
@@ -123,7 +128,11 @@ func Mess(Ses *discordgo.Session, MesC *discordgo.MessageCreate) {
 }
 
 func PostDialog(face, text, channel string) {
-	img := OD.Make(face, text)
+	img, succ := OD.Make(face, text)
+	if !succ {
+		fmt.Println("Error in draw operation")
+		return
+	}
 	b := new(bytes.Buffer)
 	err := png.Encode(b, img)
 	if err != nil {
