@@ -26,10 +26,15 @@ func main() {
 	if gopath == "" {
 		fmt.Println("FATAL ERROR:\nGOPATH IS NOT SET, PLEASE SET GOPATH TO A VALUE, OR ELSE IMAGE GENERATION WONT WORK!")
 	}
-	data, err := ioutil.ReadFile("Token")
+	var data []byte
+	var err error
+	data, err = ioutil.ReadFile("Token")
 	if err != nil {
-		fmt.Println("Error while getting token file, it probably doesnt exist:", err)
-		return
+		data, _ = ioutil.ReadFile("Token.txt")
+		if len(data) < 1 {
+			fmt.Println("Error while getting token file, it probably doesnt exist:", err)
+			return
+		}
 	}
 	fmt.Println("LOADING BOT WITH", string(data))
 	Initialize(string(data))
@@ -141,9 +146,15 @@ func PostDialog(face, text, channel string) {
 	if err != nil {
 		panic(err)
 	}
-	potchan, err := bbb.dg.UserChannelCreate(channel)
-	if err == nil {
-		channel = potchan.ID
+	_, err = bbb.dg.Channel(channel)
+	if err != nil {
+		potchan, err := bbb.dg.UserChannelCreate(channel)
+		if err == nil {
+			channel = potchan.ID
+		} else {
+			fmt.Println("Unknown error when trying to resolve channel/ID ", channel)
+			return
+		}
 	}
 	bbb.dg.ChannelTyping(channel)
 	bbb.dg.ChannelFileSend(channel, "Dialog.png", b)
