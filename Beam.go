@@ -13,11 +13,17 @@ import (
 
 	"time"
 
+	"os"
+
 	"github.com/bwmarrin/discordgo"
 	"github.com/shadowjonathan/onedialog"
 )
 
 func main() {
+	gopath := os.Getenv("GOPATH")
+	if gopath == "" {
+		fmt.Println("FATAL ERROR:\nGOPATH IS NOT SET, PLEASE SET GOPATH TO A VALUE, OR ELSE IMAGE GENERATION WONT WORK!")
+	}
 	data, err := ioutil.ReadFile("Token")
 	if err != nil {
 		fmt.Println("Error while getting token file, it probably doesnt exist:", err)
