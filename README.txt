@@ -7,7 +7,7 @@ and
 
 these will install the required libraries
 
-then grab your user-token (ask people how to do that), place it in a file called Token (just that, no extension) in %GOPATH%/src/github.com/shadowjonathan/beamer/ and do
+then grab your user-token (github.com/ShadowJonathan/OneDialog/wiki/Get-yer-token!), place it in a file called Token (just that, no extension) in %GOPATH%/src/github.com/shadowjonathan/beamer/ and do
 
     cd %GOPATH%/src/github.com/shadowjonathan/beamer/ && go run Beam.go
 
