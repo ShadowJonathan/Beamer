@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bufio"
 	fmt "fmt"
+	"log"
 
 	"io/ioutil"
 
@@ -49,6 +51,7 @@ type Bot struct {
 
 var bbb *Bot
 var err error
+var defaultchannel string
 
 // Functions after this
 
@@ -73,6 +76,24 @@ func Initialize(Token string) {
 
 func Ready(s *discordgo.Session, r *discordgo.Ready) {
 	fmt.Println("Discord: Ready message received\nSH: I am '" + r.User.Username + "'!\nSH: My User ID: " + r.User.ID)
+	fmt.Println("Ready to receive input!\nInput dialog data in this window just like discord, except for the \">tb\" part\nA default channel needs to be set, set one with '>select' in any channel, and command-line calls will select that channel as output.")
+	go func() {
+		for {
+			result := GetInput()
+			if defaultchannel == "" {
+				fmt.Println("Error, default channel not set, do so with '>select' inside one.")
+				continue
+			}
+			ts := strings.Split(result, " ")
+			if len(ts) < 2 {
+				fmt.Println("Unsufficient arguments.")
+			} else {
+				face := ts[0]
+				text := strings.Join(ts[1:], " ")
+				PostDialog(face, text, defaultchannel)
+			}
+		}
+	}()
 }
 
 func Mess(Ses *discordgo.Session, MesC *discordgo.MessageCreate) {
@@ -85,6 +106,9 @@ func Mess(Ses *discordgo.Session, MesC *discordgo.MessageCreate) {
 			} else if ts[0] == ">Q" {
 				fmt.Println("Issued quit command, stopping...")
 				os.Exit(0)
+			} else if strings.ToLower(ts[0]) == ">select" {
+				defaultchannel = MesC.ChannelID
+				bbb.dg.ChannelMessageSend(MesC.ChannelID, "`Selected channel.`")
 			}
 			if len(ts) > 2 {
 				if ts[0] == ">tb" {
@@ -105,5 +129,17 @@ func PostDialog(face, text, channel string) {
 	if err != nil {
 		panic(err)
 	}
+	bbb.dg.ChannelTyping(channel)
 	bbb.dg.ChannelFileSend(channel, "Dialog.png", b)
+}
+
+func GetInput() string {
+	reader := bufio.NewReader(os.Stdin)
+	response, err := reader.ReadString('\n')
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	response = strings.TrimSpace(response)
+	return response
 }
