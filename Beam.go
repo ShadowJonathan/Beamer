@@ -36,8 +36,9 @@ func main() {
 			return
 		}
 	}
-	fmt.Println("LOADING BOT WITH", string(data))
-	Initialize(string(data))
+	datas := strings.TrimSpace(string(data))
+	fmt.Println("LOADING BOT WITH", datas)
+	Initialize(datas)
 }
 
 type Version struct {
